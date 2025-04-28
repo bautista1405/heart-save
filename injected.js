@@ -48,6 +48,55 @@
     // require("WAWebCmd") or any other module name. This will show you available methods,
     // _events, and other properties that might be helpful for this task.
 
+    const reactionInterval = setInterval(() => {
+      clearInterval(reactionInterval);
+      if (window.Store && window.Store.Reactions) {
+        window.Store.Reactions.on('add', async (reaction) => {
+
+          //get msg Store
+          const msgStore = window.Store.Msg;
+
+          //get chat Store
+          const chatStore = window.Store.Chat;
+
+          console.log('msg store: ', msgStore);
+          console.log('chat store: ', chatStore);
+          console.log('reaction: ', reaction);
+
+          //get emoji
+          const emoji = reaction?.__x_reactionByMe?.reactionText;
+          console.log('emoji:', emoji);
+
+          //get chat id where reaction took place
+          const chatId = reaction.__x_id.remote._serialized;
+          console.log('chat id: ', chatId);
+
+          //get msgs by chat 
+          const chatMsgs = msgStore.byChat(chatId);
+          console.log('chat msgs: ', chatMsgs);
+
+          //reacted msg id: 6A4739C551DCB102EC3291A47398D1FA
+
+          const msgIds = chatMsgs._models.map(msg => msg.__x_id.id);
+          // console.log('msg Ids: ', msgIds);
+
+          const filteredMsgId = msgIds.filter(msg => msg === '6A4739C551DCB102EC3291A47398D1FA');
+          console.log('filtered msg id: ', filteredMsgId);
+
+          if (emoji === '❤️') {
+            try {
+              //which arguments does this function take?
+              //wasn't able to find it on Store.Cmd, could it be somewhere else?
+              const starMsg = await window.Store.Cmd.sendStarMsgs(chatId, filteredMsgId);
+              console.log('star msg: ', starMsg);
+            } catch (error) {
+              console.log('Error: ', error)
+            }
+          }
+        })
+      }
+    }, 2000)
+
     console.log("Reaction listener needs to be implemented");
   }
 
